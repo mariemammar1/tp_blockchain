@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>MedChain</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+
+      <div class="brand">
+        <div class="brand-icon">
+          ⚕
+        </div>
+
+        <div>
+          <h1>MedChain</h1>
+          <p>Medical Records on Blockchain</p>
+        </div>
+      </div>
+
+      <div class="connection">
+        <span class="status-dot"></span>
+        <span>Hardhat Local</span>
+      </div>
+
+    </header>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div>
+        <span class="badge">
+          BLOCKCHAIN MEDICAL SYSTEM
+        </span>
+
+        <h2>
+          Secure medical records,
+          <span>on-chain.</span>
+        </h2>
+
+        <p>
+          Register and verify the integrity of medical
+          records using blockchain technology.
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- WALLET CARD -->
+    <section class="card wallet-card">
+
+      <div class="card-header">
+
+        <div>
+          <p class="label">WALLET</p>
+          <h3>Blockchain Account</h3>
+        </div>
+
+        <div class="wallet-icon">
+          ◈
+        </div>
+
+      </div>
+
+      <div class="wallet-info">
+
+        <div class="info-item">
+
+          <span class="info-label">
+            Account
+          </span>
+
+          <span id="account" class="info-value address">
+            Not connected
+          </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span class="info-label">
+            Network
+          </span>
+
+          <span id="network" class="info-value">
+            Not connected
+          </span>
+
+        </div>
+
+      </div>
+
+      <button id="connectButton" class="primary-button">
+        <span>◈</span>
+        Connect MetaMask
+      </button>
+
+    </section>
+
+
+    <!-- MEDICAL RECORD -->
+    <section class="card">
+
+      <div class="card-header">
+
+        <div>
+          <p class="label">MEDICAL RECORD</p>
+
+          <h3>
+            Register a medical record
+          </h3>
+        </div>
+
+        <div class="security-icon">
+          🔐
+        </div>
+
+      </div>
+
+
+      <div class="form">
+
+        <div class="field">
+
+          <label for="patientId">
+            Patient ID
+          </label>
+
+          <input type="text" id="patientId" placeholder="e.g. P001">
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="medicalData">
+            Medical data
+          </label>
+
+          <textarea id="medicalData" placeholder="Enter medical record information..." rows="5"></textarea>
+
+          <small>
+            The information will be transformed
+            into a cryptographic hash.
+          </small>
+
+        </div>
+
+
+        <button id="registerButton" class="register-button">
+          <span>🔒</span>
+          Register on Blockchain
+        </button>
+
+      </div>
+
+
+      <!-- TRANSACTION STATUS -->
+
+      <div class="transaction-box">
+
+        <div class="transaction-title">
+          <span>Transaction status</span>
+        </div>
+
+        <p id="transactionStatus">
+          No transaction yet.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- CONTRACT INFO -->
+    <section class="contract-card">
+
+      <div class="contract-icon">
+        ◈
+      </div>
+
+      <div>
+
+        <p class="label">
+          SMART CONTRACT
+        </p>
+
+        <p class="contract-address">
+          0x5fbdb2315678afecb367f032d93f642f64180aa3
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+      <p>
+        MedChain · Educational Blockchain Project
+      </p>
+
+      <p>
+        Ethereum Local Network · Chain ID 31337
+      </p>
+    </footer>
+
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+
+</body>
+
+</html>

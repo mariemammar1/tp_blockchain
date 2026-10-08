@@ -1,0 +1,520 @@
+:root {
+  font-family: "Inter", sans-serif;
+
+  color: #172033;
+  background: #f4f7fb;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+  width: min(1100px, 92%);
+  margin: auto;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  height: 90px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #e5e9f0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #1769e0;
+  color: white;
+
+  font-size: 24px;
+}
+
+.brand h1 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brand p {
+  margin: 3px 0 0;
+
+  color: #7b8495;
+  font-size: 12px;
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 14px;
+
+  border-radius: 30px;
+
+  background: #eaf8ef;
+
+  color: #237a42;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #35b85b;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+  padding: 70px 0 45px;
+}
+
+.badge {
+  display: inline-block;
+
+  padding: 7px 11px;
+
+  border-radius: 6px;
+
+  background: #e8f0ff;
+
+  color: #1769e0;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.hero h2 {
+  max-width: 700px;
+
+  margin: 18px 0 14px;
+
+  font-size: clamp(38px, 5vw, 60px);
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.hero h2 span {
+  color: #1769e0;
+}
+
+.hero p {
+  max-width: 600px;
+
+  margin: 0;
+
+  color: #707a8c;
+
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  margin-bottom: 22px;
+
+  padding: 30px;
+
+  border: 1px solid #e4e8ef;
+  border-radius: 20px;
+
+  background: white;
+
+  box-shadow:
+    0 8px 30px rgba(30, 50, 80, 0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 28px;
+}
+
+.label {
+  margin: 0 0 7px;
+
+  color: #8b94a5;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.card h3 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.wallet-icon,
+.security-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #eef4ff;
+
+  color: #1769e0;
+
+  font-size: 19px;
+}
+
+
+/* =========================
+   WALLET
+========================= */
+
+.wallet-info {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+
+  margin-bottom: 24px;
+}
+
+.info-item {
+  padding: 18px;
+
+  border-radius: 13px;
+
+  background: #f7f9fc;
+}
+
+.info-label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #8b94a5;
+
+  font-size: 12px;
+}
+
+.info-value {
+  display: block;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  overflow-wrap: anywhere;
+}
+
+.address {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  border: none;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.primary-button,
+.register-button {
+  width: 100%;
+
+  padding: 14px 18px;
+
+  border-radius: 11px;
+
+  color: white;
+
+  background: #1769e0;
+
+  font-weight: 600;
+
+  box-shadow:
+    0 6px 18px rgba(23, 105, 224, 0.2);
+}
+
+.primary-button:hover,
+.register-button:hover {
+  opacity: 0.92;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  border: 1px solid #dce2eb;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #fbfcfe;
+
+  color: #172033;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #1769e0;
+
+  box-shadow:
+    0 0 0 3px rgba(23, 105, 224, 0.1);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field small {
+  color: #929bab;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   TRANSACTION
+========================= */
+
+.transaction-box {
+  margin-top: 25px;
+
+  padding: 18px;
+
+  border-radius: 12px;
+
+  background: #f7f9fc;
+}
+
+.transaction-title {
+  margin-bottom: 8px;
+
+  color: #596477;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.transaction-box p {
+  margin: 0;
+
+  color: #7b8495;
+
+  font-size: 13px;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   CONTRACT
+========================= */
+
+.contract-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-bottom: 35px;
+
+  padding: 20px;
+
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+
+  background: #f9fbff;
+}
+
+.contract-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #e8f0ff;
+
+  color: #1769e0;
+}
+
+.contract-address {
+  margin: 0;
+
+  color: #4f5b6e;
+
+  font-family: monospace;
+
+  font-size: 11px;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 25px 0 40px;
+
+  color: #9aa2b1;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+  .header {
+    height: auto;
+
+    padding: 20px 0;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    flex-direction: column;
+  }
+
+  .hero {
+    padding: 45px 0 30px;
+  }
+
+  .hero h2 {
+    font-size: 40px;
+  }
+
+  .wallet-info {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  footer {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+}

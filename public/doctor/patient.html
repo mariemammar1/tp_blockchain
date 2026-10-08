@@ -1,80 +1,440 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dossier patient</title>
-<link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dossier patient</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">🩺 Espace Médecin</div>
+      <div class="user-info">
+        <span id="doctorName"></span>
+        <button class="btn btn-secondary btn-small" onclick="logout()">
+          Déconnexion
+        </button>
+      </div>
+    </header>
 
-<header class="topbar">
-  <div class="brand">🩺 Espace Médecin</div>
-  <div class="user-info">
-    <span id="doctorName"></span>
-    <button class="btn btn-secondary btn-small" onclick="logout()">Déconnexion</button>
-  </div>
-</header>
+    <div class="container">
+      <button
+        class="link-btn"
+        onclick="window.location.href = 'dashboard.html'"
+      >
+        ← Retour à la liste des patients
+      </button>
 
-<div class="container">
-  <button class="link-btn" onclick="window.location.href='dashboard.html'">← Retour à la liste des patients</button>
-
-  <div class="card" id="patientInfoCard">
-    <h2 id="patientName">Chargement...</h2>
-    <p id="patientDetails" style="color:#64748b; font-size:14px;"></p>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <h3>➕ Nouvelle consultation</h3>
-      <form id="consultationForm">
-        <label>Motif</label>
-        <input type="text" id="reason" placeholder="Ex: Douleur abdominale" required>
-        <label>Notes</label>
-        <textarea id="notes" placeholder="Observations, examen clinique..."></textarea>
-        <button type="submit" class="btn">Ajouter la consultation</button>
-        <div class="error-msg" id="consultationError"></div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h3>Ajouter à une consultation existante</h3>
-      <label>Consultation cible</label>
-      <select id="targetConsultation"></select>
-
-      <div style="margin-top:16px;">
-        <strong>Diagnostic</strong>
-        <form id="diagnosticForm">
-          <textarea id="diagnosticDescription" placeholder="Description du diagnostic" required></textarea>
-          <button type="submit" class="btn">Ajouter le diagnostic</button>
-        </form>
+      <div class="card" id="patientInfoCard">
+        <h2 id="patientName">Chargement...</h2>
+        <p id="patientDetails" style="color: #64748b; font-size: 14px"></p>
       </div>
 
-      <div style="margin-top:20px;">
-        <strong>Prescription</strong>
-        <form id="prescriptionForm">
-          <label>Médicament</label>
-          <input type="text" id="medication" required placeholder="Ex: Paracétamol">
-          <label>Dosage</label>
-          <input type="text" id="dosage" placeholder="Ex: 500mg, 3x/jour">
-          <label>Durée</label>
-          <input type="text" id="duration" placeholder="Ex: 5 jours">
-          <label>Instructions</label>
-          <textarea id="instructions" placeholder="Instructions complementaires"></textarea>
-          <button type="submit" class="btn">Ajouter la prescription</button>
-        </form>
+      <!-- SECTION BLOCKCHAIN / METAMASK (Partie 2) -->
+      <div class="card wallet-card" id="walletCard">
+        <div class="wallet-header">
+          <div class="wallet-title">
+            <span class="wallet-icon">🦊</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Portefeuille MetaMask</h3>
+              <p class="wallet-subtitle" style="margin: 2px 0 0; color: #64748b; font-size: 13px;">
+                Connexion Blockchain Ethereum pour la certification des dossiers
+              </p>
+            </div>
+          </div>
+          <div id="walletStatusBadge" class="status-badge status-disconnected">
+            <span class="status-dot"></span>
+            <span id="walletStatusText">Non connecté</span>
+          </div>
+        </div>
+
+        <!-- Alertes : MetaMask non disponible, refus, mauvais réseau -->
+        <div id="walletAlert" class="wallet-alert hidden"></div>
+
+        <!-- Informations affichées après connexion -->
+        <div id="walletDetails" class="wallet-details hidden">
+          <div class="wallet-info-grid">
+            <div class="wallet-info-item">
+              <span class="info-label">Compte connecté</span>
+              <span id="walletAccount" class="info-value mono">-</span>
+            </div>
+            <div class="wallet-info-item">
+              <span class="info-label">Réseau Ethereum</span>
+              <span id="walletNetwork" class="info-value">-</span>
+            </div>
+            <div class="wallet-info-item">
+              <span class="info-label">Chain ID</span>
+              <span id="walletChainId" class="info-value mono">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wallet-actions">
+          <button type="button" id="connectWalletBtn" class="btn btn-wallet">
+            <span>🦊</span>
+            <span id="connectWalletBtnText">Connecter MetaMask</span>
+          </button>
+          <button type="button" id="switchNetworkBtn" class="btn btn-secondary btn-small hidden">
+            🔄 Basculer vers Hardhat (31337)
+          </button>
+        </div>
       </div>
-      <div class="error-msg" id="subFormError"></div>
+
+      <!-- SECTION SMART CONTRACT (Partie 3 — Communication et Lecture) -->
+      <div class="card contract-card" id="contractCard">
+        <div class="wallet-header">
+          <div class="wallet-title">
+            <span class="wallet-icon">📜</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Smart Contract MedicalRecord (Partie 3)</h3>
+              <p class="wallet-subtitle" style="margin: 2px 0 0; color: #64748b; font-size: 13px;">
+                Communication et vérification de l'intégrité par lecture on-chain
+              </p>
+            </div>
+          </div>
+          <div id="contractStatusBadge" class="status-badge status-disconnected">
+            <span class="status-dot"></span>
+            <span id="contractStatusText">Non initialisé</span>
+          </div>
+        </div>
+
+        <div id="contractAlert" class="wallet-alert hidden"></div>
+
+        <div class="contract-info-grid">
+          <div class="wallet-info-item">
+            <span class="info-label">Adresse du Contrat</span>
+            <span id="contractAddressDisplay" class="info-value mono" style="font-size: 12px;">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+          </div>
+          <div class="wallet-info-item">
+            <span class="info-label">ID Patient on-chain</span>
+            <span id="contractPatientIdDisplay" class="info-value mono">-</span>
+          </div>
+          <div class="wallet-info-item">
+            <span class="info-label">Nombre de versions (<code>getVersionCount</code>)</span>
+            <span id="contractVersionCount" class="info-value mono">En attente...</span>
+          </div>
+          <div class="wallet-info-item" style="grid-column: 1 / -1;">
+            <span class="info-label">Dernier Hash enregistré (<code>getLatestHash</code>)</span>
+            <span id="contractLatestHash" class="info-value mono" style="word-break: break-all;">En attente de lecture...</span>
+          </div>
+        </div>
+
+        <div class="contract-actions" style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <button type="button" id="readContractBtn" class="btn btn-secondary btn-small">
+            🔄 Interroger le contrat (Opérations de lecture)
+          </button>
+        </div>
+
+        <!-- Section de test de vérification de hash (verifyHash) -->
+        <div class="verify-section" style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px;">
+          <h4 style="margin: 0 0 8px; font-size: 14px; color: var(--text);">
+            🧪 Vérifier un Hash on-chain (<code>verifyHash</code>)
+          </h4>
+          <p style="margin: 0 0 10px; font-size: 12.5px; color: var(--muted);">
+            Tester la fonction de lecture <code>verifyHash(patientId, hash)</code> pour valider si une empreinte correspond au dossier actif.
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input
+              type="text"
+              id="testHashInput"
+              placeholder="0x... (Hash bytes32 à tester)"
+              class="mono"
+              style="flex: 1; min-width: 260px;"
+            />
+            <button type="button" id="verifyHashBtn" class="btn btn-secondary btn-small" style="margin-top:0;">
+              🔍 Tester verifyHash
+            </button>
+            <button type="button" id="fillLatestHashBtn" class="btn btn-secondary btn-small" style="margin-top:0; font-size: 12px;">
+              Copier dernier hash
+            </button>
+          </div>
+          <div id="verifyHashResult" class="wallet-alert hidden" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Journal de communication / statut de lecture -->
+        <div id="contractLogContainer" style="margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;">
+              Journal de lecture du contrat
+            </span>
+            <span id="contractLastReadTime" style="font-size: 11px; color: var(--muted);"></span>
+          </div>
+          <div id="contractReadLog" class="mono" style="background: #1e293b; color: #f8fafc; padding: 10px 12px; border-radius: 6px; font-size: 12px; max-height: 120px; overflow-y: auto; line-height: 1.4;">
+            En attente de connexion pour la lecture du contrat MedicalRecord.
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION EMPREINTE CRYPTOGRAPHIQUE (Partie 4) -->
+      <div class="card hash-card" id="recordHashCard">
+        <div class="wallet-header">
+          <div class="wallet-title">
+            <span class="wallet-icon">🔐</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Empreinte Cryptographique du Dossier (Partie 4)</h3>
+              <p class="wallet-subtitle" style="margin: 2px 0 0; color: #64748b; font-size: 13px;">
+                Calcul côté navigateur d'une empreinte bytes32 (Keccak-256) représentant l'état actuel du dossier
+              </p>
+            </div>
+          </div>
+          <div id="hashIntegrityBadge" class="status-badge status-disconnected">
+            <span class="status-dot"></span>
+            <span id="hashIntegrityText">Calcul en cours...</span>
+          </div>
+        </div>
+
+        <div id="hashCardAlert" class="wallet-alert hidden"></div>
+
+        <div class="contract-info-grid" style="margin-top: 14px;">
+          <div class="wallet-info-item" style="grid-column: 1 / -1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span class="info-label">Empreinte actuelle du dossier (Hash bytes32)</span>
+              <span style="font-size: 11px; color: var(--muted);" id="hashComputedTimestamp"></span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span id="computedRecordHash" class="info-value mono" style="font-size: 13px; word-break: break-all; background: #fff; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); flex: 1;">
+                Calcul de l'empreinte...
+              </span>
+              <button type="button" id="copyComputedHashBtn" class="btn btn-secondary btn-small" style="margin-top: 0; white-space: nowrap;">
+                📋 Copier
+              </button>
+            </div>
+          </div>
+          <div class="wallet-info-item">
+            <span class="info-label">Algorithme</span>
+            <span class="info-value mono">Keccak-256 (EVM standard)</span>
+          </div>
+          <div class="wallet-info-item">
+            <span class="info-label">Éléments inclus dans l'état</span>
+            <span id="hashElementsCount" class="info-value">Patient, Consultations, Diagnostics, Prescriptions</span>
+          </div>
+        </div>
+
+        <!-- Actions de la Partie 4 -->
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <button type="button" id="recomputeHashBtn" class="btn btn-secondary btn-small" style="margin-top: 0;">
+            ⚡ Recalculer l'empreinte
+          </button>
+          <button type="button" id="verifyCurrentIntegrityBtn" class="btn btn-secondary btn-small" style="margin-top: 0;">
+            🛡️ Vérifier l'intégrité on-chain (verifyHash)
+          </button>
+          <button type="button" id="toggleSourceDataBtn" class="btn btn-secondary btn-small" style="margin-top: 0; font-size: 12px;">
+            👁️ Afficher / Masquer données sources (JSON)
+          </button>
+        </div>
+
+        <!-- Données sources canoniques (pliable) -->
+        <div id="sourceDataContainer" class="hidden" style="margin-top: 14px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;">
+            Représentation canonique du dossier (données hachées) :
+          </span>
+          <pre id="canonicalJsonPreview" class="mono" style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 6px; font-size: 11.5px; max-height: 180px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; margin-top: 6px;"></pre>
+        </div>
+      </div>
+
+      <!-- SECTION ENREGISTREMENT BLOCKCHAIN (Partie 5) -->
+      <div class="card register-card" id="registerRecordCard">
+        <div class="wallet-header">
+          <div class="wallet-title">
+            <span class="wallet-icon">⛓️</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Ancrage Blockchain du Dossier (Partie 5)</h3>
+              <p class="wallet-subtitle" style="margin: 2px 0 0; color: #64748b; font-size: 13px;">
+                Enregistrement de l'empreinte bytes32 dans le smart contract via transaction MetaMask
+              </p>
+            </div>
+          </div>
+          <div id="registerStatusBadge" class="status-badge status-disconnected">
+            <span class="status-dot"></span>
+            <span id="registerStatusText">Prêt</span>
+          </div>
+        </div>
+
+        <div id="registerAlert" class="wallet-alert hidden"></div>
+
+        <div class="contract-info-grid" style="margin-top: 14px;">
+          <div class="wallet-info-item">
+            <span class="info-label">Patient ID on-chain</span>
+            <span id="registerPatientIdPreview" class="info-value mono">-</span>
+          </div>
+          <div class="wallet-info-item" style="grid-column: 1 / -1;">
+            <span class="info-label">Empreinte bytes32 à enregistrer</span>
+            <span id="registerHashPreview" class="info-value mono" style="font-size: 12.5px; word-break: break-all;">-</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button type="button" id="registerHashBtn" class="btn btn-wallet" style="width: 100% !important; padding: 12px 20px !important;">
+            <span>🔒</span>
+            <span id="registerHashBtnText">Enregistrer l'empreinte sur la Blockchain (registerHash)</span>
+          </button>
+        </div>
+
+        <!-- Zone d'affichage du résultat après confirmation de la transaction -->
+        <div id="txResultContainer" class="hidden" style="margin-top: 16px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <span style="font-size: 20px;">🎉</span>
+            <strong style="color: #065f46; font-size: 14px;">Empreinte enregistrée avec succès sur la Blockchain !</strong>
+          </div>
+          <div class="wallet-info-grid" style="background: white; border: 1px solid #d1fae5; margin-top: 8px;">
+            <div class="wallet-info-item">
+              <span class="info-label">Numéro de version enregistré</span>
+              <span id="txVersionRegistered" class="info-value mono" style="color: #047857; font-size: 17px; font-weight: 700;">-</span>
+            </div>
+            <div class="wallet-info-item">
+              <span class="info-label">Bloc miné</span>
+              <span id="txBlockNumber" class="info-value mono">-</span>
+            </div>
+            <div class="wallet-info-item" style="grid-column: 1 / -1;">
+              <span class="info-label">Hash du dossier enregistré (bytes32)</span>
+              <span id="txHashRegistered" class="info-value mono" style="font-size: 12px; word-break: break-all;">-</span>
+            </div>
+            <div class="wallet-info-item" style="grid-column: 1 / -1;">
+              <span class="info-label">Hash de la transaction (Tx Hash)</span>
+              <span id="txTransactionHash" class="info-value mono" style="font-size: 12px; word-break: break-all;">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION AUDIT D'INTÉGRITÉ & DÉTECTION DES MODIFICATIONS (Partie 6) -->
+      <div class="card audit-card" id="auditRecordCard">
+        <div class="wallet-header">
+          <div class="wallet-title">
+            <span class="wallet-icon">🛡️</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Audit d'Intégrité & Détection des Modifications (Partie 6)</h3>
+              <p class="wallet-subtitle" style="margin: 2px 0 0; color: #64748b; font-size: 13px;">
+                Recalcul de l'empreinte actuelle et comparaison avec la blockchain pour détecter toute modification
+              </p>
+            </div>
+          </div>
+          <div id="auditStatusBadge" class="status-badge status-disconnected">
+            <span class="status-dot"></span>
+            <span id="auditStatusText">Prêt pour audit</span>
+          </div>
+        </div>
+
+        <div id="auditAlert" class="wallet-alert hidden"></div>
+
+        <div style="margin-top: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="runAuditBtn" class="btn btn-secondary btn-small" style="font-size: 13.5px; padding: 10px 18px; width: auto; margin-top: 0;">
+            🔍 Lancer l'Audit d'Intégrité (Recalculer & Comparer)
+          </button>
+          <span style="font-size: 12px; color: var(--muted);" id="auditLastTimestamp"></span>
+        </div>
+
+        <!-- Tableau comparatif des empreintes -->
+        <div id="auditComparisonContainer" style="margin-top: 16px;">
+          <div class="wallet-info-grid">
+            <div class="wallet-info-item" style="grid-column: 1 / -1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <span class="info-label">1. Empreinte recalculée du dossier médical actuel (Local)</span>
+                <span id="auditLocalHashStatus" class="mono" style="font-size: 11px;"></span>
+              </div>
+              <span id="auditLocalHash" class="info-value mono" style="font-size: 12.5px; word-break: break-all; background: #fff; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);">
+                En attente d'audit...
+              </span>
+            </div>
+
+            <div class="wallet-info-item" style="grid-column: 1 / -1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <span class="info-label">2. Empreinte certifiée sur la Blockchain (Dernière version on-chain)</span>
+                <span id="auditChainHashStatus" class="mono" style="font-size: 11px;"></span>
+              </div>
+              <span id="auditChainHash" class="info-value mono" style="font-size: 12.5px; word-break: break-all; background: #fff; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);">
+                En attente d'audit...
+              </span>
+            </div>
+
+            <div class="wallet-info-item">
+              <span class="info-label">Comparaison des hash</span>
+              <span id="auditMatchResult" class="info-value mono">-</span>
+            </div>
+            <div class="wallet-info-item">
+              <span class="info-label">Vérification on-chain (<code>verifyHash</code>)</span>
+              <span id="auditContractVerifyResult" class="info-value mono">-</span>
+            </div>
+            <div class="wallet-info-item">
+              <span class="info-label">Diagnostic d'intégrité</span>
+              <span id="auditVerdict" class="info-value">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>➕ Nouvelle consultation</h3>
+          <form id="consultationForm">
+            <label>Motif</label>
+            <input
+              type="text"
+              id="reason"
+              placeholder="Ex: Douleur abdominale"
+              required
+            />
+            <label>Notes</label>
+            <textarea
+              id="notes"
+              placeholder="Observations, examen clinique..."
+            ></textarea>
+            <button type="submit" class="btn">Ajouter la consultation</button>
+            <div class="error-msg" id="consultationError"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Ajouter à une consultation existante</h3>
+          <label>Consultation cible</label>
+          <select id="targetConsultation"></select>
+
+          <div style="margin-top: 16px">
+            <strong>Diagnostic</strong>
+            <form id="diagnosticForm">
+              <textarea
+                id="diagnosticDescription"
+                placeholder="Description du diagnostic"
+                required
+              ></textarea>
+              <button type="submit" class="btn">Ajouter le diagnostic</button>
+            </form>
+          </div>
+
+          <div style="margin-top: 20px">
+            <strong>Prescription</strong>
+            <form id="prescriptionForm">
+              <label>Médicament</label>
+              <input
+                type="text"
+                id="medication"
+                required
+                placeholder="Ex: Paracétamol"
+              />
+              <label>Dosage</label>
+              <input type="text" id="dosage" placeholder="Ex: 500mg, 3x/jour" />
+              <label>Durée</label>
+              <input type="text" id="duration" placeholder="Ex: 5 jours" />
+              <label>Instructions</label>
+              <textarea
+                id="instructions"
+                placeholder="Instructions complementaires"
+              ></textarea>
+              <button type="submit" class="btn">Ajouter la prescription</button>
+            </form>
+          </div>
+          <div class="error-msg" id="subFormError"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📋 Historique médical</h3>
+        <div id="historyContainer"></div>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <h3>📋 Historique médical</h3>
-    <div id="historyContainer"></div>
-  </div>
-</div>
-
-<script src="../js/api.js"></script>
-<script src="js/patient.js"></script>
-</body>
+    <script src="../js/api.js"></script>
+    <script src="../js/lib/ethers.min.js"></script>
+    <script src="js/patient.js"></script>
+  </body>
 </html>

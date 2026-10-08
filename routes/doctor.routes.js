@@ -2,9 +2,86 @@
 const express = require('express');
 const db = require('../config/db');
 const { verifyToken, requireRole } = require('../middleware/auth');
+const { hashPassword, comparePassword } = require('../utils/password');
 
 const router = express.Router();
 router.use(verifyToken, requireRole('medecin'));
+
+// GET /api/doctor/profile
+router.get('/profile', (req, res) => {
+  const profile = db
+    .prepare(
+      `SELECT dp.id as doctor_id, u.name, u.email, dp.specialty, dp.phone
+       FROM doctor_profiles dp JOIN users u ON u.id = dp.user_id
+       WHERE dp.id = ?`
+    )
+    .get(req.user.profileId);
+
+  if (!profile) return res.status(404).json({ error: 'Profil introuvable.' });
+  res.json(profile);
+});
+
+// PUT /api/doctor/profile
+router.put('/profile', (req, res) => {
+  const { name, email, currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Le nom est requis.' });
+  }
+  if (!email || !email.trim()) {
+    return res.status(400).json({ error: "L'email est requis." });
+  }
+
+  const cleanName = name.trim();
+  const cleanEmail = email.trim().toLowerCase();
+
+  const existingUser = db
+    .prepare('SELECT id FROM users WHERE email = ? AND id != ?')
+    .get(cleanEmail, req.user.id);
+
+  if (existingUser) {
+    return res.status(409).json({ error: 'Cet email est deja utilise par un autre compte.' });
+  }
+
+  const isChangingPassword = Boolean(newPassword || confirmPassword);
+  if (isChangingPassword) {
+    if (!currentPassword) {
+      return res.status(400).json({ error: 'Le mot de passe actuel est requis pour changer votre mot de passe.' });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Les nouveaux mots de passe ne correspondent pas.' });
+    }
+    if (newPassword.trim().length < 4) {
+      return res.status(400).json({ error: 'Le nouveau mot de passe doit contenir au moins 4 caracteres.' });
+    }
+
+    const user = db.prepare('SELECT password FROM users WHERE id = ?').get(req.user.id);
+    if (!user || !comparePassword(currentPassword, user.password)) {
+      return res.status(401).json({ error: 'Mot de passe actuel incorrect.' });
+    }
+
+    const hashed = hashPassword(newPassword.trim());
+    db.prepare('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?').run(
+      cleanName,
+      cleanEmail,
+      hashed,
+      req.user.id
+    );
+  } else {
+    db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?').run(
+      cleanName,
+      cleanEmail,
+      req.user.id
+    );
+  }
+
+  const docProfile = db.prepare('SELECT specialty FROM doctor_profiles WHERE id = ?').get(req.user.profileId);
+
+  res.json({
+    message: 'Profil mis a jour avec succes.',
+    user: { name: cleanName, email: cleanEmail, specialty: docProfile ? docProfile.specialty : null }
+  });
+});
 
 // GET /api/doctor/patients
 // Liste des patients assignes a ce medecin seulement.
